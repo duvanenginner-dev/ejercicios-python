@@ -40,6 +40,9 @@ class CuentaBancaria(ABC):
         
     def consultar_saldo(self):
         return self._saldo
+    
+    def __str__(self) -> str:
+        return f"Titular: {self.titular}\nCuenta: {self._cuenta}\nSaldo: {self._saldo}"
 
 class CuentaAhorros(CuentaBancaria):
     def __init__(self, titular, cuenta, saldo, interes_cuenta):
@@ -63,6 +66,9 @@ class CuentaAhorros(CuentaBancaria):
     
     def consultar_saldo(self):
         return f"Saldo disponible: {super().consultar_saldo()}"
+    
+    def __str__(self) -> str:
+        return f"{super().__str__()}\nInteres: {self.interes_cuenta}"
     
 class CuentaCorriente(CuentaBancaria):
     def __init__(self, titular, cuenta, saldo, intereses, sobregiro):
@@ -98,8 +104,43 @@ class CuentaCorriente(CuentaBancaria):
     
     def consultar_saldo(self):
         return f"Saldo disponible: {super().consultar_saldo()}"
-        
     
+    def __str__(self) -> str:
+        return f"{super().__str__()}\nInteres: {self.intereses}\nSobregiro: {self.sobregiro}"
+
+class Banco:
+    def __init__(self, nombre):
+        self.nombre = nombre
+        self.lista_cuentas = []    
+    
+    def guardar_cuenta(self, **kwargs):
+        if not kwargs:
+            print("No se puede registrar esta cuenta")
+            return
+        
+        if kwargs in self.lista_cuentas:
+            print("Esta cuenta ya existe")
+            return
+        
+        self.lista_cuentas.append(kwargs)
+        print("Cuenta guardada exitosamente..")
+        
+    def buscar_cuenta(self, cuenta):
+            validar = next((c[str(cuenta)] for c in self.lista_cuentas if str(cuenta) in c), None)
+            if validar:
+                print("Si exiete esta cuenta")
+            else:
+                print("Esta cuenta no existe")
+            
+    def listar_cuenta(self):
+        if not self.lista_cuentas:
+            print("No hay cuentas registradas")
+            return
+        for cuenta in self.lista_cuentas:
+            print("==================")
+            for valor in cuenta.values():
+                print(valor)
+                print("=================")
 
 cuenta1 = CuentaAhorros("Duvan", 12345,  200000, 2)
 cuenta1.depositar(5000)
@@ -112,3 +153,7 @@ cuenta2.depositar(50000)
 cuenta2.retirar(300000)
 cuenta2.calcular_interes()
 print(cuenta2.consultar_saldo())
+
+banco = Banco("Bancolombia")
+banco.guardar_cuenta(**{str(cuenta1._cuenta): cuenta1, str(cuenta2._cuenta): cuenta2})
+banco.buscar_cuenta(1234)
